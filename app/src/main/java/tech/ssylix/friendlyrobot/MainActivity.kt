@@ -1,5 +1,6 @@
 package tech.ssylix.friendlyrobot
 
+import android.content.Context
 import android.os.Build
 import android.os.Bundle
 import android.view.View
@@ -20,5 +21,12 @@ class MainActivity : AppCompatActivity() {
         viewPager.adapter = sectionsPagerAdapter
         val tabs: TabLayout = findViewById(R.id.tabs)
         tabs.setupWithViewPager(viewPager)
+
+        initializeId(getSharedPreferences(SHARED_PREF_PERM_ID, Context.MODE_PRIVATE))
+    }
+
+    companion object {
+        val ID_PREFERENCE = "Permanent_id"
+        val SHARED_PREF_PERM_ID = "Uid_Prefs"
     }
 }

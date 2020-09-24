@@ -1,5 +1,6 @@
 package tech.ssylix.friendlyrobot
 
+import android.content.Context
 import android.content.res.ColorStateList
 import android.os.Build
 import android.os.Bundle
@@ -8,6 +9,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.FrameLayout
 import android.widget.TextView
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -15,6 +17,8 @@ import androidx.recyclerview.widget.StaggeredGridLayoutManager
 import kotlinx.android.synthetic.main.activity_home.*
 import kotlinx.android.synthetic.main.content_home.*
 import kotlinx.android.synthetic.main.content_home.view.*
+import java.util.*
+import kotlin.collections.HashMap
 
 class Home : AppCompatActivity() {
 
@@ -37,10 +41,11 @@ class Home : AppCompatActivity() {
         save_skill_button.setOnClickListener {
             val trigger = (frameView.getChildAt(0) as? TextView)?.text
             val actions =
-                (option_action_recycler as? OptionActionsRecyclerAdapter)?.actions?.apply {
+                (option_action_recycler.adapter as OptionActionsRecyclerAdapter).actions.apply {
                     remove(null)
                 }
-            if (trigger != null && actions != null) {
+
+            if (trigger != null && actions.isNotEmpty()) {
                 var actionsText = StringBuilder()
                 actions.forEachIndexed { index, s ->
                     actionsText.append(s)
@@ -48,15 +53,26 @@ class Home : AppCompatActivity() {
                         actionsText.append(" and then ")
                     }
                 }
-                val fulltext = "If I ${trigger.toString().toLowerCase()} then I will $actionsText"
+                val fulltext = "If I ${trigger.toString().toLowerCase(Locale.getDefault())} then" +
+                        " I will ${actionsText.toString().toLowerCase(Locale.getDefault())}"
 
-                uploadToRemote(fulltext)
+                uploadToRemote(fulltext.toast(this))
+
+            } else if (trigger == null) {
+                trigger.toast(this, Toast.LENGTH_LONG, "Trigger failure")
+            } else if (actions.isEmpty()) {
+                actions.toast(this, Toast.LENGTH_LONG, "Actions failure")
             }
         }
     }
 
     private fun uploadToRemote(fulltext: String) {
+        val sharedPrefs =
+            getSharedPreferences(MainActivity.SHARED_PREF_PERM_ID, Context.MODE_PRIVATE)
+        val data = HashMap<String, String>()
 
+        data[getRandomString(48)] = fulltext
+        uploadToFirebaseFirestore(sharedPrefs, data)
     }
 
     inner class OptionListRecyclerAdapter(val options: List<String>) :
@@ -231,6 +247,11 @@ class Home : AppCompatActivity() {
                     .inflate(R.layout.model_option, FrameLayout(this@Home), false)
                 (view as TextView).apply {
                     text = actions[position]
+                    backgroundTintList = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                        ColorStateList.valueOf(resources.getColor(R.color.colorActionOption, theme))
+                    } else {
+                        ColorStateList.valueOf(resources.getColor(R.color.colorActionOption))
+                    }
                 }
 
                 holder.itemView.frameView.apply {

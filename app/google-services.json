@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "555537251572",
+    "firebase_url": "https://friendlyrobot-6e404.firebaseio.com",
+    "project_id": "friendlyrobot-6e404",
+    "storage_bucket": "friendlyrobot-6e404.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:555537251572:android:463699464b1a26984d72a1",
+        "android_client_info": {
+          "package_name": "tech.ssylix.friendlyrobot"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "555537251572-ggfjtahcljg06slejdcdmq9vp3iq9j62.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "tech.ssylix.friendlyrobot",
+            "certificate_hash": "1d75eb02f746ed16b93a2219a23c73fa8f73f63c"
+          }
+        },
+        {
+          "client_id": "555537251572-pmheeugn7bg856h1orh9h9drmb1n719l.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCILgsfzna-g01a1AQFXfb_zf3s27cWWHE"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "555537251572-pmheeugn7bg856h1orh9h9drmb1n719l.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
