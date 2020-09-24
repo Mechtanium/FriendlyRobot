@@ -6,6 +6,7 @@ import android.util.Log
 import android.widget.Toast
 import androidx.constraintlayout.widget.Constraints.TAG
 import androidx.core.content.edit
+import com.google.firebase.firestore.DocumentSnapshot
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
 
@@ -16,13 +17,38 @@ fun getRandomString(length: Int): String {
         .joinToString("")
 }
 
+val firestore = Firebase.firestore
+private val DATA_COLLECTION_FOLDER = "data"
 
-fun uploadToFirebaseFirestore(preferences: SharedPreferences, data: HashMap<String, String>) {
-    val firestore = Firebase.firestore
+@Synchronized
+fun readFromFirebaseFirestore(
+    preferences: SharedPreferences,
+    action: (DocumentSnapshot) -> Boolean
+) {
     val id = preferences.getString(MainActivity.ID_PREFERENCE, "")
 
     if (id != null) {
-        firestore.collection("data")
+        firestore.collection(DATA_COLLECTION_FOLDER)
+            .document(id).apply {
+                get().addOnSuccessListener {
+                    if (!action.invoke(it)) readFromFirebaseFirestore(preferences, action)
+                }.addOnFailureListener {
+                    Log.e(TAG, "readFromDatabase: ${it.message}")
+                    readFromFirebaseFirestore(preferences, action)
+                }
+            }
+    } else {
+        initializeId(preferences)
+        readFromFirebaseFirestore(preferences, action)
+    }
+}
+
+fun uploadToFirebaseFirestore(preferences: SharedPreferences, data: HashMap<String, String>) {
+
+    val id = preferences.getString(MainActivity.ID_PREFERENCE, "")
+
+    if (id != null) {
+        firestore.collection(DATA_COLLECTION_FOLDER)
             .document(id)
             .apply {
                 get().addOnSuccessListener { snapshot ->
@@ -31,7 +57,6 @@ fun uploadToFirebaseFirestore(preferences: SharedPreferences, data: HashMap<Stri
                             data[it.key] = it.value
                         }
                         this.set(data)
-                        Log.e(TAG, data.toString())
                     } else {
                         this.set(data)
                     }

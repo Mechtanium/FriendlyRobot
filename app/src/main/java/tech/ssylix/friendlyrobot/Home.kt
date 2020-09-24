@@ -34,7 +34,42 @@ class Home : AppCompatActivity() {
 
         option_list_recycler.apply {
             layoutManager = StaggeredGridLayoutManager(3, StaggeredGridLayoutManager.HORIZONTAL)
-            adapter = OptionListRecyclerAdapter(listOf("See a face", "Hear my name"))
+            adapter = OptionListRecyclerAdapter(
+                listOf(
+                    "See a face",
+                    "Hear my name",
+                    "Lorem Ipsum",
+                    "Lorem Ipsum",
+                    "Lorem Ipsum",
+                    "Lorem Ipsum",
+                    "Lorem Ipsum",
+                    "Lorem Ipsum",
+                    "Lorem Ipsum",
+                    "Lorem Ipsum",
+                    "Lorem Ipsum",
+                    "Lorem Ipsum",
+                    "Lorem Ipsum",
+                    "Lorem Ipsum",
+                    "Lorem Ipsum",
+                    "Lorem Ipsum",
+                    "Lorem Ipsum"
+                    ,
+                    "Lorem Ipsum",
+                    "Lorem Ipsum",
+                    "Lorem Ipsum",
+                    "Lorem Ipsum",
+                    "Lorem Ipsum",
+                    "Lorem Ipsum",
+                    "Lorem Ipsum"
+                    ,
+                    "Lorem Ipsum",
+                    "Lorem Ipsum",
+                    "Lorem Ipsum",
+                    "Lorem Ipsum",
+                    "Lorem Ipsum",
+                    "Lorem Ipsum"
+                )
+            )
             setHasFixedSize(true)
         }
 
@@ -56,7 +91,7 @@ class Home : AppCompatActivity() {
                 val fulltext = "If I ${trigger.toString().toLowerCase(Locale.getDefault())} then" +
                         " I will ${actionsText.toString().toLowerCase(Locale.getDefault())}"
 
-                uploadToRemote(fulltext.toast(this))
+                uploadToRemote(fulltext)
 
             } else if (trigger == null) {
                 trigger.toast(this, Toast.LENGTH_LONG, "Trigger failure")
@@ -73,6 +108,7 @@ class Home : AppCompatActivity() {
 
         data[getRandomString(48)] = fulltext
         uploadToFirebaseFirestore(sharedPrefs, data)
+        finish()
     }
 
     inner class OptionListRecyclerAdapter(val options: List<String>) :
@@ -169,7 +205,42 @@ class Home : AppCompatActivity() {
                         option_list_recycler.apply {
                             layoutManager =
                                 StaggeredGridLayoutManager(3, StaggeredGridLayoutManager.HORIZONTAL)
-                            adapter = OptionListRecyclerAdapter(listOf("Dance", "Sing a song"))
+                            adapter = OptionListRecyclerAdapter(
+                                listOf(
+                                    "Dance",
+                                    "Sing a song",
+                                    "Lorem Ipsum",
+                                    "Lorem Ipsum",
+                                    "Lorem Ipsum",
+                                    "Lorem Ipsum",
+                                    "Lorem Ipsum",
+                                    "Lorem Ipsum",
+                                    "Lorem Ipsum",
+                                    "Lorem Ipsum",
+                                    "Lorem Ipsum",
+                                    "Lorem Ipsum",
+                                    "Lorem Ipsum",
+                                    "Lorem Ipsum",
+                                    "Lorem Ipsum",
+                                    "Lorem Ipsum",
+                                    "Lorem Ipsum"
+                                    ,
+                                    "Lorem Ipsum",
+                                    "Lorem Ipsum",
+                                    "Lorem Ipsum",
+                                    "Lorem Ipsum",
+                                    "Lorem Ipsum",
+                                    "Lorem Ipsum",
+                                    "Lorem Ipsum"
+                                    ,
+                                    "Lorem Ipsum",
+                                    "Lorem Ipsum",
+                                    "Lorem Ipsum",
+                                    "Lorem Ipsum",
+                                    "Lorem Ipsum",
+                                    "Lorem Ipsum"
+                                )
+                            )
                             setHasFixedSize(true)
                         }
                     } else {

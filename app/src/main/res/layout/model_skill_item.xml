@@ -5,19 +5,22 @@
     android:layout_height="match_parent">
 
     <TextView
-        android:id="@+id/textView"
+        android:id="@+id/skill_text"
         android:layout_width="0dp"
         android:layout_height="match_parent"
         android:layout_marginTop="16dp"
         android:layout_marginEnd="16dp"
         android:layout_marginBottom="16dp"
         android:background="@drawable/shape_rc16"
+        android:ellipsize="end"
         android:gravity="center"
         android:padding="16dp"
         android:text="TextView"
         android:textAlignment="center"
         android:textColor="@android:color/white"
         android:textSize="18sp"
+        android:maxLines="8"
+        android:textStyle="bold"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintDimensionRatio="1:1.4"
         app:layout_constraintEnd_toEndOf="parent"

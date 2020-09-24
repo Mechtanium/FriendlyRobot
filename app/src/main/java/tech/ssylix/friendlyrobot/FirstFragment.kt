@@ -1,5 +1,6 @@
 package tech.ssylix.friendlyrobot
 
+import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -9,6 +10,7 @@ import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import kotlinx.android.synthetic.main.fragment_first.view.*
+import kotlinx.android.synthetic.main.model_skill_item.view.*
 
 /**
  * A simple [Fragment] subclass as the default destination in the navigation.
@@ -23,16 +25,46 @@ class FirstFragment : Fragment() {
         return inflater.inflate(R.layout.fragment_first, container, false)
     }
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
+    override fun onResume() {
+        super.onResume()
+        readFromDatabase()
+    }
 
-        view.skills_list_recycler.apply {
-            layoutManager =
-                LinearLayoutManager(requireContext(), LinearLayoutManager.HORIZONTAL, false)
-            adapter = SkillsRecyclerAdapter(arrayListOf(""))
-            setHasFixedSize(true)
+    private fun readFromDatabase() {
+        val sharedPrefs =
+            requireActivity().getSharedPreferences(
+                MainActivity.SHARED_PREF_PERM_ID,
+                Context.MODE_PRIVATE
+            )
+
+        readFromFirebaseFirestore(sharedPrefs) {
+            if (it.data != null) {
+                val arraylist = arrayListOf<String>()
+                it.data?.forEach { entry ->
+                    arraylist.add(entry.value.toString())
+                }
+
+                try {
+                    view!!.skills_list_recycler.apply {
+                        layoutManager =
+                            LinearLayoutManager(
+                                requireContext(),
+                                LinearLayoutManager.HORIZONTAL,
+                                false
+                            )
+                        adapter = SkillsRecyclerAdapter(arraylist)
+                        setHasFixedSize(true)
+
+                        return@readFromFirebaseFirestore true
+                    }
+                } catch (k: KotlinNullPointerException) {
+                    k.printStackTrace()
+                }
+            }
+            return@readFromFirebaseFirestore false
         }
     }
+
 
     inner class SkillsRecyclerAdapter(val skills: ArrayList<String>) :
         RecyclerView.Adapter<SkillsRecyclerAdapter.MyViewHolder>() {
@@ -72,7 +104,9 @@ class FirstFragment : Fragment() {
         }
 
         override fun onBindViewHolder(holder: MyViewHolder, position: Int) {
-
+            if (position > 0) {
+                holder.itemView.skill_text.text = skills[position]
+            }
         }
 
         override fun getItemViewType(position: Int): Int {
