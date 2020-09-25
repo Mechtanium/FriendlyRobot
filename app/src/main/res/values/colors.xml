@@ -3,7 +3,7 @@
     <color name="colorPrimary">#FFFFFF</color>
     <color name="colorPrimaryDark">#FFFFFF</color>
     <color name="colorAccent">#03A8DA</color>
-    <color name="themeTextPrimary">#333333</color>
+    <color name="themeTextPrimary">#494949</color>
     <color name="actionTextGrey">#777777</color>
     <color name="actionTextGreyDark">#333333</color>
     <color name="backgroundGrey">#2C333333</color>

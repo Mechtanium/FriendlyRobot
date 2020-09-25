@@ -3,9 +3,11 @@ package tech.ssylix.friendlyrobot
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.constraintlayout.widget.Constraints.TAG
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -60,6 +62,17 @@ class FirstFragment : Fragment() {
                 } catch (k: KotlinNullPointerException) {
                     k.printStackTrace()
                 }
+            } else {
+                view?.skills_list_recycler?.apply {
+                    layoutManager =
+                        LinearLayoutManager(
+                            requireContext(),
+                            LinearLayoutManager.HORIZONTAL,
+                            false
+                        )
+                    adapter = SkillsRecyclerAdapter(arrayListOf())
+                    setHasFixedSize(true)
+                }
             }
             return@readFromFirebaseFirestore false
         }
@@ -78,8 +91,11 @@ class FirstFragment : Fragment() {
         inner class MyViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
             init {
                 itemView.setOnClickListener {
-                    if (adapterPosition == 0) {
-                        startActivity(Intent(requireContext(), Home::class.java))
+                    it.animateClicks {
+                        if (adapterPosition == 0) {
+                            Log.e(TAG, "Got here too")
+                            startActivity(Intent(requireContext(), Home::class.java))
+                        }
                     }
                 }
             }

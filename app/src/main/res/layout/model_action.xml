@@ -33,7 +33,7 @@
             android:layout_height="wrap_content"
             android:background="@drawable/shape_rc64_stk2_orange"
             android:padding="8dp"
-            app:srcCompat="@android:drawable/ic_input_add" />
+            app:srcCompat="@drawable/ic_plus" />
     </FrameLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

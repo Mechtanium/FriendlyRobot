@@ -3,6 +3,8 @@
 
     <corners android:radius="@dimen/shape_curvature" />
 
+    <solid android:color="@android:color/white" />
+
     <stroke
         android:width="3dp"
         android:color="@color/colorAccent" />

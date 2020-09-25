@@ -76,7 +76,7 @@
                     app:layout_constraintEnd_toEndOf="@+id/option_stage_recycler"
                     app:layout_constraintStart_toEndOf="@+id/textView2"
                     app:layout_constraintTop_toTopOf="@+id/textView2"
-                    app:srcCompat="@android:drawable/ic_input_add" />
+                    app:srcCompat="@drawable/ic_plus" />
             </FrameLayout>
 
             <androidx.recyclerview.widget.RecyclerView

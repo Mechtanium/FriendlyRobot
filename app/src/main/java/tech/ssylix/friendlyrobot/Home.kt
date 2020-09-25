@@ -1,6 +1,7 @@
 package tech.ssylix.friendlyrobot
 
 import android.content.Context
+import android.content.SharedPreferences
 import android.content.res.ColorStateList
 import android.os.Build
 import android.os.Bundle
@@ -17,10 +18,14 @@ import androidx.recyclerview.widget.StaggeredGridLayoutManager
 import kotlinx.android.synthetic.main.activity_home.*
 import kotlinx.android.synthetic.main.content_home.*
 import kotlinx.android.synthetic.main.content_home.view.*
+import tech.ssylix.friendlyrobot.MainActivity.Companion.ACTIONS_LIST
+import tech.ssylix.friendlyrobot.MainActivity.Companion.TRIGGER_LIST
 import java.util.*
 import kotlin.collections.HashMap
 
 class Home : AppCompatActivity() {
+
+    lateinit var sharedPrefs: SharedPreferences
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -31,79 +36,50 @@ class Home : AppCompatActivity() {
         //supportNavigateUpTo(Intent(this, MainActivity::class.java))
 
         toolbar.title = SELECT_TRIGGER_TEXT
+        sharedPrefs = getSharedPreferences(MainActivity.SHARED_PREF_PERM_ID, Context.MODE_PRIVATE)
 
         option_list_recycler.apply {
             layoutManager = StaggeredGridLayoutManager(3, StaggeredGridLayoutManager.HORIZONTAL)
             adapter = OptionListRecyclerAdapter(
-                listOf(
-                    "See a face",
-                    "Hear my name",
-                    "Lorem Ipsum",
-                    "Lorem Ipsum",
-                    "Lorem Ipsum",
-                    "Lorem Ipsum",
-                    "Lorem Ipsum",
-                    "Lorem Ipsum",
-                    "Lorem Ipsum",
-                    "Lorem Ipsum",
-                    "Lorem Ipsum",
-                    "Lorem Ipsum",
-                    "Lorem Ipsum",
-                    "Lorem Ipsum",
-                    "Lorem Ipsum",
-                    "Lorem Ipsum",
-                    "Lorem Ipsum"
-                    ,
-                    "Lorem Ipsum",
-                    "Lorem Ipsum",
-                    "Lorem Ipsum",
-                    "Lorem Ipsum",
-                    "Lorem Ipsum",
-                    "Lorem Ipsum",
-                    "Lorem Ipsum"
-                    ,
-                    "Lorem Ipsum",
-                    "Lorem Ipsum",
-                    "Lorem Ipsum",
-                    "Lorem Ipsum",
-                    "Lorem Ipsum",
-                    "Lorem Ipsum"
-                )
+                sharedPrefs.getString(TRIGGERS, "")?.split(DELIMETER) ?: TRIGGER_LIST
             )
             setHasFixedSize(true)
         }
 
         save_skill_button.setOnClickListener {
             val trigger = (frameView.getChildAt(0) as? TextView)?.text
-            val actions =
-                (option_action_recycler.adapter as OptionActionsRecyclerAdapter).actions.apply {
-                    remove(null)
-                }
-
-            if (trigger != null && actions.isNotEmpty()) {
-                var actionsText = StringBuilder()
-                actions.forEachIndexed { index, s ->
-                    actionsText.append(s)
-                    if (index < actions.size - 1) {
-                        actionsText.append(" and then ")
+            try {
+                val actions =
+                    (option_action_recycler.adapter as OptionActionsRecyclerAdapter).actions.apply {
+                        remove(null)
                     }
+
+                if (trigger != null && actions.isNotEmpty()) {
+                    var actionsText = StringBuilder()
+                    actions.forEachIndexed { index, s ->
+                        actionsText.append(s)
+                        if (index < actions.size - 1) {
+                            actionsText.append(" and then ")
+                        }
+                    }
+                    val fulltext =
+                        "If I ${trigger.toString().toLowerCase(Locale.getDefault())} then" +
+                                " I will ${actionsText.toString().toLowerCase(Locale.getDefault())}"
+
+                    uploadToRemote(fulltext)
+
+                } else if (trigger == null) {
+                    trigger.toast(this, Toast.LENGTH_LONG, "Trigger failure")
+                } else if (actions.isEmpty()) {
+                    actions.toast(this, Toast.LENGTH_LONG, "Actions failure")
                 }
-                val fulltext = "If I ${trigger.toString().toLowerCase(Locale.getDefault())} then" +
-                        " I will ${actionsText.toString().toLowerCase(Locale.getDefault())}"
-
-                uploadToRemote(fulltext)
-
-            } else if (trigger == null) {
-                trigger.toast(this, Toast.LENGTH_LONG, "Trigger failure")
-            } else if (actions.isEmpty()) {
-                actions.toast(this, Toast.LENGTH_LONG, "Actions failure")
+            } catch (c: TypeCastException) {
+                c.printStackTrace()
             }
         }
     }
 
     private fun uploadToRemote(fulltext: String) {
-        val sharedPrefs =
-            getSharedPreferences(MainActivity.SHARED_PREF_PERM_ID, Context.MODE_PRIVATE)
         val data = HashMap<String, String>()
 
         data[getRandomString(48)] = fulltext
@@ -117,21 +93,23 @@ class Home : AppCompatActivity() {
         inner class MyViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
             init {
                 itemView.setOnClickListener {
-                    if (option_stage_recycler.adapter != null) {
-                        (option_stage_recycler.adapter as OptionStageRecyclerAdapter).apply {
-                            mutableOptions.add(options[adapterPosition])
-                            notifyDataSetChanged()
-                        }
-                    } else {
-                        option_stage_recycler.apply {
-                            layoutManager = LinearLayoutManager(
-                                this@Home,
-                                LinearLayoutManager.HORIZONTAL,
-                                false
-                            )
-                            adapter =
-                                OptionStageRecyclerAdapter(arrayListOf(options[adapterPosition]))
-                            setHasFixedSize(true)
+                    it.animateClicks {
+                        if (option_stage_recycler.adapter != null) {
+                            (option_stage_recycler.adapter as OptionStageRecyclerAdapter).apply {
+                                mutableOptions.add(options[adapterPosition])
+                                notifyDataSetChanged()
+                            }
+                        } else {
+                            option_stage_recycler.apply {
+                                layoutManager = LinearLayoutManager(
+                                    this@Home,
+                                    LinearLayoutManager.HORIZONTAL,
+                                    false
+                                )
+                                adapter =
+                                    OptionStageRecyclerAdapter(arrayListOf(options[adapterPosition]))
+                                setHasFixedSize(true)
+                            }
                         }
                     }
                 }
@@ -174,79 +152,52 @@ class Home : AppCompatActivity() {
         inner class MyViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
             init {
                 itemView.setOnClickListener {
-                    if (toolbar.title == SELECT_TRIGGER_TEXT) {
-                        val view = LayoutInflater.from(this@Home)
-                            .inflate(R.layout.model_option, FrameLayout(this@Home), false)
-                        (view as TextView).text = mutableOptions[adapterPosition]
+                    it.animateClicks {
+                        if (toolbar.title == SELECT_TRIGGER_TEXT) {
+                            val view = LayoutInflater.from(this@Home)
+                                .inflate(R.layout.model_option, FrameLayout(this@Home), false)
+                            (view as TextView).text = mutableOptions[adapterPosition]
 
-                        frameView.apply {
-                            removeAllViews()
-                            addView(view)
-                        }
+                            frameView.apply {
+                                removeAllViews()
+                                addView(view)
+                            }
 
-                        option_action_recycler.apply {
-                            layoutManager = LinearLayoutManager(this@Home)
-                            adapter = OptionActionsRecyclerAdapter(arrayListOf(null))
-                            setHasFixedSize(true)
-                        }
+                            option_action_recycler.apply {
+                                layoutManager = LinearLayoutManager(this@Home)
+                                adapter = OptionActionsRecyclerAdapter(arrayListOf(null))
+                                setHasFixedSize(true)
+                            }
 
-                        this@Home.toolbar.title = SELECT_ACTION_TEXT
+                            this@Home.toolbar.title = SELECT_ACTION_TEXT
 
-                        option_stage_recycler.apply {
-                            layoutManager = LinearLayoutManager(
-                                this@Home,
-                                LinearLayoutManager.HORIZONTAL,
-                                false
-                            )
-                            adapter = OptionStageRecyclerAdapter(arrayListOf())
-                            setHasFixedSize(true)
-                        }
-
-                        option_list_recycler.apply {
-                            layoutManager =
-                                StaggeredGridLayoutManager(3, StaggeredGridLayoutManager.HORIZONTAL)
-                            adapter = OptionListRecyclerAdapter(
-                                listOf(
-                                    "Dance",
-                                    "Sing a song",
-                                    "Lorem Ipsum",
-                                    "Lorem Ipsum",
-                                    "Lorem Ipsum",
-                                    "Lorem Ipsum",
-                                    "Lorem Ipsum",
-                                    "Lorem Ipsum",
-                                    "Lorem Ipsum",
-                                    "Lorem Ipsum",
-                                    "Lorem Ipsum",
-                                    "Lorem Ipsum",
-                                    "Lorem Ipsum",
-                                    "Lorem Ipsum",
-                                    "Lorem Ipsum",
-                                    "Lorem Ipsum",
-                                    "Lorem Ipsum"
-                                    ,
-                                    "Lorem Ipsum",
-                                    "Lorem Ipsum",
-                                    "Lorem Ipsum",
-                                    "Lorem Ipsum",
-                                    "Lorem Ipsum",
-                                    "Lorem Ipsum",
-                                    "Lorem Ipsum"
-                                    ,
-                                    "Lorem Ipsum",
-                                    "Lorem Ipsum",
-                                    "Lorem Ipsum",
-                                    "Lorem Ipsum",
-                                    "Lorem Ipsum",
-                                    "Lorem Ipsum"
+                            option_stage_recycler.apply {
+                                layoutManager = LinearLayoutManager(
+                                    this@Home,
+                                    LinearLayoutManager.HORIZONTAL,
+                                    false
                                 )
+                                adapter = OptionStageRecyclerAdapter(arrayListOf())
+                                setHasFixedSize(true)
+                            }
+
+                            option_list_recycler.apply {
+                                layoutManager =
+                                    StaggeredGridLayoutManager(
+                                        3,
+                                        StaggeredGridLayoutManager.HORIZONTAL
+                                    )
+                                adapter = OptionListRecyclerAdapter(
+                                    sharedPrefs.getString(ACTIONS, "")?.split(DELIMETER)
+                                        ?: ACTIONS_LIST
+                                )
+                                setHasFixedSize(true)
+                            }
+                        } else {
+                            (option_action_recycler.adapter as OptionActionsRecyclerAdapter).addNewAction(
+                                mutableOptions[adapterPosition]
                             )
-                            setHasFixedSize(true)
                         }
-                    } else {
-                        (option_action_recycler.adapter as OptionActionsRecyclerAdapter).addNewAction(
-                            mutableOptions[adapterPosition]
-                        )
                     }
                 }
             }
@@ -290,8 +241,10 @@ class Home : AppCompatActivity() {
         inner class MyViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
             init {
                 itemView.setOnClickListener {
-                    actions.removeAt(adapterPosition)
-                    this@OptionActionsRecyclerAdapter.notifyItemRemoved(adapterPosition)
+                    it.animateClicks {
+                        actions.removeAt(adapterPosition)
+                        this@OptionActionsRecyclerAdapter.notifyItemRemoved(adapterPosition)
+                    }
                 }
             }
         }
