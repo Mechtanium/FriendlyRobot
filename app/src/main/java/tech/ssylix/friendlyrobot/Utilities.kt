@@ -85,7 +85,7 @@ fun initializeId(preferences: SharedPreferences) {
         preferences.edit {
             putString(
                 MainActivity.ID_PREFERENCE,
-                uid /*"c9v2nVLo0mJHfnnPhuBBuVJrchoQk3k8FB660yM5YkXDB4OO"*/
+                uid
             )
             this.apply()
         }

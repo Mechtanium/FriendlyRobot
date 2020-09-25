@@ -30,13 +30,13 @@ class MainActivity : AppCompatActivity() {
         }
 
         sharedPreferences = getSharedPreferences(SHARED_PREF_PERM_ID, Context.MODE_PRIVATE)
+        initializeId(sharedPreferences)
+        initializeTriggers(sharedPreferences, TRIGGER_LIST)
+        initializeActions(sharedPreferences, ACTIONS_LIST)
         readFromFirebaseFirestore(sharedPreferences) {
             offlineStatus.visibility = View.GONE
             true
         }
-        initializeId(sharedPreferences)
-        initializeTriggers(sharedPreferences, TRIGGER_LIST)
-        initializeActions(sharedPreferences, ACTIONS_LIST)
     }
 
     companion object {
